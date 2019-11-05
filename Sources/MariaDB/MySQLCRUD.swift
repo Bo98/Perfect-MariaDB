@@ -532,6 +532,21 @@ extension Date {
 			self = d
 			return
 		}
+
+		// DATE fields
+		dateFormatter.dateFormat = "yyyy-MM-dd"
+		if let d = dateFormatter.date(from: string) {
+			self = d
+			return
+		}
+
+		// TIME fields
+		dateFormatter.dateFormat = "HH:mm:ss"
+		if let d = dateFormatter.date(from: string) {
+			self = d
+			return
+		}
+
 		return nil
 	}
 }
