@@ -1791,6 +1791,55 @@ class MariaDBTests: XCTestCase {
 			XCTFail("\(error)")
 		}
 	}
+
+	func testDate() {
+		do {
+			let db = try getTestDB()
+			struct TableWithDate: Codable {
+				let id: Int
+				let date: Date
+			}
+			try db.sql("CREATE TABLE TableWithDate(id BIGINT PRIMARY KEY, date DATE)")
+			let t1 = db.table(TableWithDate.self)
+			let newOne = TableWithDate(id: 2000, date: Date())
+			try t1.insert(newOne)
+			let j1 = t1.where(\TableWithDate.id == newOne.id)
+			let j2 = try j1.select().map {$0}
+			XCTAssertEqual(try j1.count(), 1)
+			XCTAssertEqual(j2.count, 1)
+			XCTAssertEqual(j2[0].id, 2000)
+			XCTAssertTrue(Calendar.current.isDate(j2[0].date, inSameDayAs: newOne.date))
+		} catch {
+			XCTFail("\(error)")
+		}
+	}
+
+	func testTime() {
+		do {
+			let db = try getTestDB()
+			struct TableWithDate: Codable {
+				let id: Int
+				let time: Date
+			}
+			try db.sql("CREATE TABLE TableWithDate(id BIGINT PRIMARY KEY, time TIME)")
+			let t1 = db.table(TableWithDate.self)
+			let newOne = TableWithDate(id: 2000, time: Date())
+			try t1.insert(newOne)
+			let j1 = t1.where(\TableWithDate.id == newOne.id)
+			let j2 = try j1.select().map {$0}
+			XCTAssertEqual(try j1.count(), 1)
+			XCTAssertEqual(j2.count, 1)
+			XCTAssertEqual(j2[0].id, 2000)
+
+			let newOneComponents = Calendar.current.dateComponents([.hour, .minute, .second], from: newOne.time)
+			let j2Components = Calendar.current.dateComponents([.hour, .minute, .second], from: j2[0].time)
+			XCTAssertEqual(newOneComponents.hour, j2Components.hour)
+			XCTAssertEqual(newOneComponents.minute, j2Components.minute)
+			XCTAssertEqual(newOneComponents.second, j2Components.second)
+		} catch {
+			XCTFail("\(error)")
+		}
+	}
 }
 
 extension MariaDBTests {
@@ -1845,7 +1894,9 @@ extension MariaDBTests {
                     ("testBespokeSQL", testBespokeSQL),
                     ("testURL", testURL),
                     ("testLastInsertId", testLastInsertId),
-                    ("testEmptyInsert", testEmptyInsert)
+                    ("testEmptyInsert", testEmptyInsert),
+					("testDate", testDate),
+					("testTime", testTime)
         ]
     }
 }
