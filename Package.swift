@@ -28,7 +28,7 @@ let package = Package(
             targets: ["MariaDB"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/PerfectlySoft/Perfect-CRUD.git", from: "1.2.3")
+		.package(url: "https://github.com/Bo98/Perfect-CRUD.git", .branch("bo"))
     ],
     targets: [
         .systemLibrary(name: "mariadbclient",
